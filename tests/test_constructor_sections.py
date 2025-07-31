@@ -1,36 +1,27 @@
 import pytest
-import time
-from selenium.webdriver.common.by import By
 from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
+from data.urls import MAIN
 from locators.construction_locators import ConstructorPageLocators
 
-class TestConstructorNavigation:
-    @pytest.fixture(autouse=True)
-    def setup(self, driver, base_url):
-        self.driver = driver
-        self.base_url = base_url
-        self.driver.get(base_url)
-        WebDriverWait(self.driver, 10).until(
-            EC.visibility_of_element_located(ConstructorPageLocators.BUNS_SECTION)
-        )
+@pytest.mark.parametrize("tab_locator, expected_text", [
+    (ConstructorPageLocators.BUNS_TAB, "Булки"),
+    (ConstructorPageLocators.SAUCES_TAB, "Соусы"),
+    (ConstructorPageLocators.TOPPINGS_TAB, "Начинки"),
+])
+def test_switch_tabs(driver, tab_locator, expected_text):
+    driver.get(MAIN)
+    active_tab_text = WebDriverWait(driver, 5).until(
+        EC.visibility_of_element_located(ConstructorPageLocators.ACTIVE_TAB)
+    ).text
 
-    @pytest.mark.parametrize("section,locator,expected_text", [
-        ("Булки", ConstructorPageLocators.BUNS_SECTION, "Булки"),
-        ("Соусы", ConstructorPageLocators.SAUCES_SECTION, "Соусы"),
-        ("Начинки", ConstructorPageLocators.TOPPINGS_SECTION, "Начинки")
-    ])
-    def test_section_navigation(self, section, locator, expected_text):
+    if active_tab_text != expected_text:
+        WebDriverWait(driver, 10).until(
+            EC.element_to_be_clickable(tab_locator)
+        ).click()
 
-        element = WebDriverWait(self.driver, 10).until(
-            EC.presence_of_element_located(locator)
-        )
-        self.driver.execute_script("arguments[0].scrollIntoView(true);", element)
-        time.sleep(1)
-        
-        self.driver.execute_script("arguments[0].click();", element)
-        
-        active_tab = WebDriverWait(self.driver, 10).until(
-            EC.visibility_of_element_located(ConstructorPageLocators.ACTIVE_TAB)
-        )
-        assert expected_text in active_tab.text
+    WebDriverWait(driver, 5).until(
+        EC.text_to_be_present_in_element(ConstructorPageLocators.ACTIVE_TAB, expected_text)
+    )
+    active_tab = driver.find_element(*ConstructorPageLocators.ACTIVE_TAB)
+    assert active_tab.text == expected_text

@@ -57,6 +57,7 @@ def test_login_from_account_button(driver, base_url):
         EC.visibility_of_element_located((By.XPATH, "//button[text()='Оформить заказ']"))
     )
 
+
 def test_login_from_registration_form(driver, base_url):
     """Тест входа через форму регистрации"""
     driver.get(f"{base_url}/register")

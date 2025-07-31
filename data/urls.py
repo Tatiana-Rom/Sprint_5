@@ -1,6 +1,5 @@
-class Urls:
-    MAIN = "https://stellarburgers.nomoreparties.site/"
-    LOGIN = "https://stellarburgers.nomoreparties.site/login"
-    PROFILE = "https://stellarburgers.nomoreparties.site/account/profile"
-    REGISTER = "https://stellarburgers.nomoreparties.site/register"
-    FORGOT_PASSWORD = "https://stellarburgers.nomoreparties.site/forgot-password"
+MAIN = "https://stellarburgers.nomoreparties.site"
+LOGIN = f"{MAIN}/login"
+PROFILE = f"{MAIN}/account/profile"
+REGISTER = f"{MAIN}/register"
+FORGOT_PASSWORD = f"{MAIN}/forgot-password"
