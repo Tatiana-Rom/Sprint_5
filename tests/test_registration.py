@@ -1,63 +1,74 @@
 import pytest
-import os
 from selenium.webdriver.common.by import By
 from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
+from locators.registration_locators import RegistrationLocators
 from data.user import ValidData
+from data.urls import MAIN
 
-email = ValidData.login
-password = ValidData.password
+class TestRegistration:
+    def test_successful_registration(self, driver):
+        """Успешная регистрация с валидными данными"""
+        driver.get(MAIN)
 
-def test_successful_registration(driver, base_url):
-    driver.get(base_url)
+        WebDriverWait(driver, 10).until(
+            EC.element_to_be_clickable((By.XPATH, "//button[text()='Войти в аккаунт']"))
+        ).click()
 
-    driver.find_element(By.XPATH, "//button[text()='Войти в аккаунт']").click()
-    WebDriverWait(driver, 5).until(EC.visibility_of_element_located((By.XPATH, "//h2[text()='Вход']")))
-    driver.find_element(By.XPATH, "//a[text()='Зарегистрироваться']").click()
-    WebDriverWait(driver, 5).until(EC.visibility_of_element_located((By.XPATH, "//h2[text()='Регистрация']")))
+        WebDriverWait(driver, 10).until(
+            EC.visibility_of_element_located((By.XPATH, "//h2[text()='Вход']"))
+        )
+        driver.find_element(By.XPATH, "//a[text()='Зарегистрироваться']").click()
 
-    name = ValidData.user_name
-    email = ValidData.login
-    password = ValidData.password
+        WebDriverWait(driver, 10).until(
+            EC.visibility_of_element_located(RegistrationLocators.REGISTRATION_TITLE)
+        )
 
-    driver.find_element(By.XPATH, "//fieldset[1]//input").send_keys(name)
-    driver.find_element(By.XPATH, "//fieldset[2]//input").send_keys(email)
-    driver.find_element(By.XPATH, "//fieldset[3]//input").send_keys(password)
+        name = ValidData.user_name
+        email = ValidData.login
+        password = ValidData.password
 
-    assert "@" in email and "." in email.split("@")[1], "Некорректный email"
-    assert len(password) >= 6, "Пароль слишком короткий"
+        assert "@" in email and "." in email.split("@")[-1], "Некорректный email"
+        assert len(password) >= 6, "Пароль слишком короткий"
 
-    driver.find_element(By.XPATH, "//button[text()='Зарегистрироваться']").click()
-    WebDriverWait(driver, 5).until(EC.visibility_of_element_located((By.XPATH, "//h2[text()='Вход']")))
+        driver.find_element(*RegistrationLocators.NAME_INPUT).send_keys(name)
+        driver.find_element(*RegistrationLocators.EMAIL_INPUT).send_keys(email)
+        driver.find_element(*RegistrationLocators.PASSWORD_INPUT).send_keys(password)
+        driver.find_element(*RegistrationLocators.REGISTER_BUTTON).click()
 
-    current_dir = os.path.dirname(os.path.abspath(__file__))
-    file_path = os.path.join(current_dir, "data", "last_user.txt")
-    os.makedirs(os.path.dirname(file_path), exist_ok=True)
-    with open(file_path, "w", encoding="utf-8") as f:
-        f.write(f"{email},{password}")
+        WebDriverWait(driver, 10).until(
+            EC.visibility_of_element_located((By.XPATH, "//h2[text()='Вход']"))
+        )
 
-def test_registration_with_short_password(driver, base_url):
-    driver.get(base_url)
+    def test_registration_with_short_password(self, driver):
+        """Регистрация с коротким паролем — ожидается ошибка"""
+        driver.get(MAIN)
 
-    driver.find_element(By.XPATH, "//button[text()='Войти в аккаунт']").click()
-    WebDriverWait(driver, 5).until(EC.visibility_of_element_located((By.XPATH, "//h2[text()='Вход']")))
-    driver.find_element(By.XPATH, "//a[text()='Зарегистрироваться']").click()
-    WebDriverWait(driver, 5).until(EC.visibility_of_element_located((By.XPATH, "//h2[text()='Регистрация']")))
+        WebDriverWait(driver, 10).until(
+            EC.element_to_be_clickable((By.XPATH, "//button[text()='Войти в аккаунт']"))
+        ).click()
 
-    name = ValidData.user_name
-    email = ValidData.login
-    short_password = "12345"
+        WebDriverWait(driver, 10).until(
+            EC.visibility_of_element_located((By.XPATH, "//h2[text()='Вход']"))
+        )
+        driver.find_element(By.XPATH, "//a[text()='Зарегистрироваться']").click()
 
-    driver.find_element(By.XPATH, "//fieldset[1]//input").send_keys(name)
-    driver.find_element(By.XPATH, "//fieldset[2]//input").send_keys(email)
-    driver.find_element(By.XPATH, "//fieldset[3]//input").send_keys(short_password)
+        WebDriverWait(driver, 10).until(
+            EC.visibility_of_element_located(RegistrationLocators.REGISTRATION_TITLE)
+        )
 
-    assert len(short_password) < 6, "Тест должен использовать пароль < 6 символов"
+        name = ValidData.user_name
+        email = ValidData.login
+        short_password = "12345"
 
-    driver.find_element(By.XPATH, "//button[text()='Зарегистрироваться']").click()
+        assert len(short_password) < 6, "Тест должен использовать слишком короткий пароль"
 
+        driver.find_element(*RegistrationLocators.NAME_INPUT).send_keys(name)
+        driver.find_element(*RegistrationLocators.EMAIL_INPUT).send_keys(email)
+        driver.find_element(*RegistrationLocators.PASSWORD_INPUT).send_keys(short_password)
+        driver.find_element(*RegistrationLocators.REGISTER_BUTTON).click()
 
-    error = WebDriverWait(driver, 10).until(
-        EC.visibility_of_element_located((By.XPATH, "//p[contains(text(), 'Некорректный пароль')]"))
-    )
-    assert error.is_displayed(), "Ожидалась ошибка о некорректном пароле"
+        error = WebDriverWait(driver, 10).until(
+            EC.visibility_of_element_located(RegistrationLocators.INCORRECT_PASSWORD_ERROR)
+        )
+        assert error.is_displayed(), "Ожидалась ошибка о некорректном пароле"
