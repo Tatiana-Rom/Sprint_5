@@ -1,14 +1,14 @@
 from selenium.webdriver.common.by import By
 
 class ConstructorPageLocators:
+    BUNS_TAB = (By.XPATH, "//span[normalize-space()='Булки']")
+    SAUCES_TAB = (By.XPATH, "//span[normalize-space()='Соусы']")
+    TOPPINGS_TAB = (By.XPATH, "//span[normalize-space()='Начинки']")
 
-    BUNS_TAB = (By.XPATH, "//span[text()='Булки']/parent::div[contains(@class, 'tab_tab')]")
-    SAUCES_TAB = (By.XPATH, "//span[text()='Соусы']/parent::div[contains(@class, 'tab_tab')]")
-    TOPPINGS_TAB = (By.XPATH, "//span[text()='Начинки']/parent::div[contains(@class, 'tab_tab')]")
+    CURRENT_TAB = (By.XPATH, "//div[contains(@class, 'tab_tab_type_current')]")
 
-    BUNS_SECTION = (By.XPATH, "//h2[text()='Булки']")
-    SAUCES_SECTION = (By.XPATH, "//h2[text()='Соусы']")
-    TOPPINGS_SECTION = (By.XPATH, "//h2[text()='Начинки']")
-
-    ACTIVE_TAB = (By.XPATH, "//div[contains(@class, 'tab_tab_type_current')]/span")
-    CONSTRUCTOR_BUTTON = (By.XPATH, "//p[text()='Конструктор']")
+    BREAD = (By.XPATH, "//h2[normalize-space()='Булки']/following-sibling::ul")
+    SAUCES = (By.XPATH, "//h2[normalize-space()='Соусы']/following-sibling::ul")
+    TOPPINGS = (By.XPATH, "//h2[normalize-space()='Начинки']/following-sibling::ul")
+    CREATE = (By.XPATH, "//h1[text()='Соберите бургер']")
+    LINK_CONSTRUCT = (By.XPATH, "//p[text()='Конструктор']/parent::a[1]")
