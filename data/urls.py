@@ -1,6 +1,6 @@
 MAIN = "https://stellarburgers.nomoreparties.site/"
 LOGIN = f"{MAIN}login"
 PROFILE = f"{MAIN}account/profile"
-ACCOUNT = f"{MAIN}account/account"
+ACCOUNT = f"{MAIN}account"
 REGISTER = f"{MAIN}register"
 FORGOT_PASSWORD = f"{MAIN}forgot-password"
